@@ -6,7 +6,7 @@ public class Sky {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        String[] tasks = new String[MAX_TASKS];
+        Task[] tasks = new Task[MAX_TASKS];
         int taskCount = 0;
 
         System.out.println("____________________________________________");
@@ -26,22 +26,47 @@ public class Sky {
 
             if (input.equals("list")) {
                 System.out.println("____________________________________________");
+                System.out.println("Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
-                    System.out.println("    " + (i + 1) + ". " + tasks[i]);
+                    System.out.println("    " + (i + 1) + ".[" 
+                            + tasks[i].getStatusIcon() + "] "
+                            + tasks[i].getDescription());
                 }
                 System.out.println("____________________________________________");
                 continue;
             }
 
-            // otherwise, treat input as a task to add
-            if (taskCount < MAX_TASKS) {
-                tasks[taskCount] = input;
-                taskCount++;
+            if (input.startsWith("mark ")) {
+                int index = Integer.parseInt(input.substring(5)) - 1;
+                tasks[index].markAsDone();
 
                 System.out.println("____________________________________________");
-                System.out.println("    added: " + input);
+                System.out.println("Nice! I've marked this task as done:");
+                System.out.println("    [" + tasks[index].getStatusIcon() + "] "
+                        + tasks[index].getDescription());
                 System.out.println("____________________________________________");
+                continue;
             }
+
+            if (input.startsWith("unmark ")) {
+                int index = Integer.parseInt(input.substring(7)) - 1;
+                tasks[index].markAsNotDone();
+
+                System.out.println("____________________________________________");
+                System.out.println("OK, I've marked this task as not done yet:");
+                System.out.println("    [" + tasks[index].getStatusIcon() + "] "
+                        + tasks[index].getDescription());
+                System.out.println("____________________________________________");
+                continue;
+            }
+
+            // otherwise, add task
+            tasks[taskCount] = new Task(input);
+            taskCount++;
+
+            System.out.println("____________________________________________");
+            System.out.println("    added: " + input);
+            System.out.println("____________________________________________");
         }
 
         scanner.close();
