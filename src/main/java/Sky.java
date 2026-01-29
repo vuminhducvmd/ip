@@ -1,39 +1,37 @@
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Sky {
+    private static Ui ui;
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        ArrayList<Task> tasks = Storage.load();
+        ui = new Ui();
+        ui.showWelcome();
+        
+        TaskList tasks = new TaskList(Storage.load());
 
-        System.out.println("____________________________________________");
-        System.out.println("Hello! I'm Sky");
-        System.out.println("What can I do for you?");
-        System.out.println("____________________________________________");
+        ui.showLine();
+        ui.showMessage("Hello! I'm Sky");
+        ui.showMessage("What can I do for you?");
+        ui.showLine();
 
         boolean isRunning = true;
 
         while (isRunning) {
-            String input = scanner.nextLine();
+            String input = ui.readCommand();
 
             try {
-                CommandType commandType = parseCommandType(input);
+                CommandType commandType = Parser.parseCommandType(input);
 
                 switch (commandType) {
                     case BYE ->     {
-                        System.out.println("____________________________________________");
-                        System.out.println("Bye. Hope to see you again soon!");
-                        System.out.println("____________________________________________");
+                        ui.showBye();
                         isRunning = false;;     
                     }
 
                     case LIST -> printList(tasks);
 
                     case MARK ->  {
-                        int index = parseIndex(input, "mark");
+                        int index = Parser.parseIndex(input, "mark");
                         tasks.get(index).markAsDone();
                         Storage.save(tasks);
 
@@ -41,7 +39,7 @@ public class Sky {
                     }
 
                     case UNMARK ->  {
-                        int index = parseIndex(input, "unmark");
+                        int index = Parser.parseIndex(input, "unmark");
                         tasks.get(index).markAsNotDone();
                         Storage.save(tasks);
 
@@ -49,15 +47,15 @@ public class Sky {
                     }
 
                     case DELETE ->  {
-                        int index = parseIndex(input, "delete");
+                        int index = Parser.parseIndex(input, "delete");
                         Task removed = tasks.remove(index);
                         Storage.save(tasks);
 
-                        System.out.println("____________________________________________");
-                        System.out.println("Noted. I've removed this task:");
-                        System.out.println("    " + removed);
-                        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-                        System.out.println("____________________________________________");
+                        ui.showLine();
+                        ui.showMessage("Noted. I've removed this task:");
+                        ui.showMessage("    " + removed);
+                        ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
+                        ui.showLine();
                     }
 
                     case TODO ->  {
@@ -75,7 +73,7 @@ public class Sky {
                         if (parts.length < 2 || parts[0].isBlank()) {
                             throw new SkyException("A deadline must have a description and /by <time>.");
                         }
-                        LocalDate by = parseDate(parts[1], "deadline /by");
+                        LocalDate by = Parser.parseDate(parts[1], "deadline /by");
                         tasks.add(new Deadline(parts[0], by));
                         Storage.save(tasks);
                         printAddMessage(tasks);
@@ -86,8 +84,8 @@ public class Sky {
                         if (parts.length < 3 || parts[0].isBlank()) {
                             throw new SkyException("An event must have /from <start> /to <end>.");
                         }
-                        LocalDate from = parseDate(parts[1], "event /from");
-                        LocalDate to = parseDate(parts[2], "event /to");
+                        LocalDate from = Parser.parseDate(parts[1], "event /from");
+                        LocalDate to = Parser.parseDate(parts[2], "event /to");
                         tasks.add(new Event(parts[0], from, to));
                         Storage.save(tasks);
                         printAddMessage(tasks);
@@ -97,90 +95,42 @@ public class Sky {
                 }
 
             } catch (SkyException e) {
-                System.out.println("____________________________________________");
-                System.out.println("Oops! " + e.getMessage());
-                System.out.println("____________________________________________");
+                ui.showLine();
+                ui.showMessage("Oops! " + e.getMessage());
+                ui.showLine();
             } catch (IndexOutOfBoundsException e) {
-                System.out.println("____________________________________________");
-                System.out.println("Oops! That task number does not exist.");
-                System.out.println("____________________________________________");
+                ui.showLine();
+                ui.showMessage("Oops! That task number does not exist.");
+                ui.showLine();
             }
         }
 
-        scanner.close();
     }
 
     // ---------- helpers ----------
 
-    private static int parseIndex(String input, String command) throws SkyException {
-        try {
-            int index = Integer.parseInt(input.substring(command.length()).trim()) - 1;
-            if (index < 0) {
-                throw new SkyException("Task number must be positive.");
-            }
-            return index;
-        } catch (NumberFormatException e) {
-            throw new SkyException("Please provide a valid task number.");
-        }
-    }
-
-    private static LocalDate parseDate(String value, String fieldName) throws SkyException {
-        try {
-            return LocalDate.parse(value.trim()); // expects yyyy-MM-dd
-        } catch (DateTimeParseException e) {
-            throw new SkyException("Invalid " + fieldName + " date. Use yyyy-mm-dd (e.g., 2019-10-15).");
-        }
-    }
-
-    private static void printList(ArrayList<Task> tasks) {
-        System.out.println("____________________________________________");
-        System.out.println("Here are the tasks in your list:");
+    private static void printList(TaskList tasks) {
+        ui.showLine();
+        ui.showMessage("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
-            System.out.println("    " + (i + 1) + "." + tasks.get(i));
+            ui.showMessage("    " + (i + 1) + "." + tasks.get(i));
         }
-        System.out.println("____________________________________________");
+        ui.showLine();
     }
 
-    private static void printAddMessage(ArrayList<Task> tasks) {
-        System.out.println("____________________________________________");
-        System.out.println("Got it. I've added this task:");
-        System.out.println("    " + tasks.get(tasks.size() - 1));
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        System.out.println("____________________________________________");
+    private static void printAddMessage(TaskList tasks) {
+        ui.showLine();
+        ui.showMessage("Got it. I've added this task:");
+        ui.showMessage("    " + tasks.get(tasks.size() - 1));
+        ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
+        ui.showLine();
     }
 
     private static void printSingleTask(String message, Task task) {
-        System.out.println("____________________________________________");
-        System.out.println(message);
-        System.out.println("    " + task);
-        System.out.println("____________________________________________");
+        ui.showLine();
+        ui.showMessage(message);
+        ui.showMessage("    " + task);
+        ui.showLine();
     }
 
-    private static CommandType parseCommandType(String input) {
-        if (input.equals("bye")) {
-            return CommandType.BYE;
-        }
-        if (input.equals("list")) {
-            return CommandType.LIST;
-        }
-        if (input.startsWith("todo")) {
-            return CommandType.TODO;
-        }
-        if (input.startsWith("deadline")) {
-            return CommandType.DEADLINE;
-        }
-        if (input.startsWith("event")) {
-            return CommandType.EVENT;
-        }
-        if (input.startsWith("mark ")) {
-            return CommandType.MARK;
-        }
-        if (input.startsWith("unmark ")) {
-            return CommandType.UNMARK;
-        }
-        if (input.startsWith("delete ")) {
-            return CommandType.DELETE;
-        }
-        return CommandType.UNKNOWN;
-    }
 }

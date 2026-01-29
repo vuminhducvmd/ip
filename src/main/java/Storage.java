@@ -2,9 +2,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.time.LocalDate;
 
 public class Storage {
 
@@ -33,7 +33,7 @@ public class Storage {
         return tasks;
     }
 
-    public static void save(ArrayList<Task> tasks) {
+    public static void save(TaskList tasks) {
         try {
             File dir = new File(DATA_DIR);
             if (!dir.exists()) {
@@ -41,8 +41,8 @@ public class Storage {
             }
 
             PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH));
-            for (Task task : tasks) {
-                writer.println(task.toDataString());
+            for (int i = 0; i < tasks.size(); i++)  {
+                writer.println(tasks.get(i).toDataString());
             }
             writer.close();
         } catch (IOException e) {
