@@ -1,5 +1,4 @@
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 
 public class Sky {
     private static Ui ui;
@@ -7,7 +6,7 @@ public class Sky {
     public static void main(String[] args) {
         ui = new Ui();
         ui.showWelcome();
-
+        
         TaskList tasks = new TaskList(Storage.load());
 
         ui.showLine();
@@ -21,7 +20,7 @@ public class Sky {
             String input = ui.readCommand();
 
             try {
-                CommandType commandType = parseCommandType(input);
+                CommandType commandType = Parser.parseCommandType(input);
 
                 switch (commandType) {
                     case BYE ->     {
@@ -32,7 +31,7 @@ public class Sky {
                     case LIST -> printList(tasks);
 
                     case MARK ->  {
-                        int index = parseIndex(input, "mark");
+                        int index = Parser.parseIndex(input, "mark");
                         tasks.get(index).markAsDone();
                         Storage.save(tasks);
 
@@ -40,7 +39,7 @@ public class Sky {
                     }
 
                     case UNMARK ->  {
-                        int index = parseIndex(input, "unmark");
+                        int index = Parser.parseIndex(input, "unmark");
                         tasks.get(index).markAsNotDone();
                         Storage.save(tasks);
 
@@ -48,7 +47,7 @@ public class Sky {
                     }
 
                     case DELETE ->  {
-                        int index = parseIndex(input, "delete");
+                        int index = Parser.parseIndex(input, "delete");
                         Task removed = tasks.remove(index);
                         Storage.save(tasks);
 
@@ -74,7 +73,7 @@ public class Sky {
                         if (parts.length < 2 || parts[0].isBlank()) {
                             throw new SkyException("A deadline must have a description and /by <time>.");
                         }
-                        LocalDate by = parseDate(parts[1], "deadline /by");
+                        LocalDate by = Parser.parseDate(parts[1], "deadline /by");
                         tasks.add(new Deadline(parts[0], by));
                         Storage.save(tasks);
                         printAddMessage(tasks);
@@ -85,8 +84,8 @@ public class Sky {
                         if (parts.length < 3 || parts[0].isBlank()) {
                             throw new SkyException("An event must have /from <start> /to <end>.");
                         }
-                        LocalDate from = parseDate(parts[1], "event /from");
-                        LocalDate to = parseDate(parts[2], "event /to");
+                        LocalDate from = Parser.parseDate(parts[1], "event /from");
+                        LocalDate to = Parser.parseDate(parts[2], "event /to");
                         tasks.add(new Event(parts[0], from, to));
                         Storage.save(tasks);
                         printAddMessage(tasks);
@@ -109,26 +108,6 @@ public class Sky {
     }
 
     // ---------- helpers ----------
-
-    private static int parseIndex(String input, String command) throws SkyException {
-        try {
-            int index = Integer.parseInt(input.substring(command.length()).trim()) - 1;
-            if (index < 0) {
-                throw new SkyException("Task number must be positive.");
-            }
-            return index;
-        } catch (NumberFormatException e) {
-            throw new SkyException("Please provide a valid task number.");
-        }
-    }
-
-    private static LocalDate parseDate(String value, String fieldName) throws SkyException {
-        try {
-            return LocalDate.parse(value.trim()); // expects yyyy-MM-dd
-        } catch (DateTimeParseException e) {
-            throw new SkyException("Invalid " + fieldName + " date. Use yyyy-mm-dd (e.g., 2019-10-15).");
-        }
-    }
 
     private static void printList(TaskList tasks) {
         ui.showLine();
@@ -154,31 +133,4 @@ public class Sky {
         ui.showLine();
     }
 
-    private static CommandType parseCommandType(String input) {
-        if (input.equals("bye")) {
-            return CommandType.BYE;
-        }
-        if (input.equals("list")) {
-            return CommandType.LIST;
-        }
-        if (input.startsWith("todo")) {
-            return CommandType.TODO;
-        }
-        if (input.startsWith("deadline")) {
-            return CommandType.DEADLINE;
-        }
-        if (input.startsWith("event")) {
-            return CommandType.EVENT;
-        }
-        if (input.startsWith("mark ")) {
-            return CommandType.MARK;
-        }
-        if (input.startsWith("unmark ")) {
-            return CommandType.UNMARK;
-        }
-        if (input.startsWith("delete ")) {
-            return CommandType.DELETE;
-        }
-        return CommandType.UNKNOWN;
-    }
 }
