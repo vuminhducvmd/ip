@@ -5,7 +5,7 @@ public class Sky {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Task> tasks = new ArrayList<>();
+        ArrayList<Task> tasks = Storage.load();
 
         System.out.println("____________________________________________");
         System.out.println("Hello! I'm Sky");
@@ -45,6 +45,8 @@ public class Sky {
                     case DELETE ->  {
                         int index = parseIndex(input, "delete");
                         Task removed = tasks.remove(index);
+                        Storage.save(tasks);
+
                         System.out.println("____________________________________________");
                         System.out.println("Noted. I've removed this task:");
                         System.out.println("    " + removed);
@@ -58,6 +60,7 @@ public class Sky {
                             throw new SkyException("The description of a todo cannot be empty.");
                         }
                         tasks.add(new Todo(desc));
+                        Storage.save(tasks);
                         printAddMessage(tasks);
                     }
 
@@ -67,6 +70,7 @@ public class Sky {
                             throw new SkyException("A deadline must have a description and /by <time>.");
                         }
                         tasks.add(new Deadline(parts[0], parts[1]));
+                        Storage.save(tasks);
                         printAddMessage(tasks);
                     }
 
@@ -76,6 +80,7 @@ public class Sky {
                             throw new SkyException("An event must have /from <start> /to <end>.");
                         }
                         tasks.add(new Event(parts[0], parts[1], parts[2]));
+                        Storage.save(tasks);
                         printAddMessage(tasks);
                     }
 

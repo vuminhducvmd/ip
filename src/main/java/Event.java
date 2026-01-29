@@ -13,4 +13,10 @@ public class Event extends Task {
         return "[E][" + getStatusIcon() + "] " + description
                 + " (from: " + from + " to: " + to + ")";
     }
+
+    @Override
+    public String toDataString() {
+        return "E | " + (isDone ? "1" : "0")
+                + " | " + description + " | " + from + " | " + to;
+    }
 }
