@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -33,12 +35,16 @@ public class Sky {
                     case MARK ->  {
                         int index = parseIndex(input, "mark");
                         tasks.get(index).markAsDone();
+                        Storage.save(tasks);
+
                         printSingleTask("Nice! I've marked this task as done:", tasks.get(index));
                     }
 
                     case UNMARK ->  {
                         int index = parseIndex(input, "unmark");
                         tasks.get(index).markAsNotDone();
+                        Storage.save(tasks);
+
                         printSingleTask("OK, I've marked this task as not done yet:", tasks.get(index));
                     }
 
@@ -69,7 +75,8 @@ public class Sky {
                         if (parts.length < 2 || parts[0].isBlank()) {
                             throw new SkyException("A deadline must have a description and /by <time>.");
                         }
-                        tasks.add(new Deadline(parts[0], parts[1]));
+                        LocalDate by = parseDate(parts[1], "deadline /by");
+                        tasks.add(new Deadline(parts[0], by));
                         Storage.save(tasks);
                         printAddMessage(tasks);
                     }
@@ -79,7 +86,9 @@ public class Sky {
                         if (parts.length < 3 || parts[0].isBlank()) {
                             throw new SkyException("An event must have /from <start> /to <end>.");
                         }
-                        tasks.add(new Event(parts[0], parts[1], parts[2]));
+                        LocalDate from = parseDate(parts[1], "event /from");
+                        LocalDate to = parseDate(parts[2], "event /to");
+                        tasks.add(new Event(parts[0], from, to));
                         Storage.save(tasks);
                         printAddMessage(tasks);
                     }
@@ -112,6 +121,14 @@ public class Sky {
             return index;
         } catch (NumberFormatException e) {
             throw new SkyException("Please provide a valid task number.");
+        }
+    }
+
+    private static LocalDate parseDate(String value, String fieldName) throws SkyException {
+        try {
+            return LocalDate.parse(value.trim()); // expects yyyy-MM-dd
+        } catch (DateTimeParseException e) {
+            throw new SkyException("Invalid " + fieldName + " date. Use yyyy-mm-dd (e.g., 2019-10-15).");
         }
     }
 
