@@ -1,6 +1,5 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 
 public class Sky {
     private static Ui ui;
@@ -9,7 +8,7 @@ public class Sky {
         ui = new Ui();
         ui.showWelcome();
 
-        ArrayList<Task> tasks = Storage.load();
+        TaskList tasks = new TaskList(Storage.load());
 
         ui.showLine();
         ui.showMessage("Hello! I'm Sky");
@@ -131,7 +130,7 @@ public class Sky {
         }
     }
 
-    private static void printList(ArrayList<Task> tasks) {
+    private static void printList(TaskList tasks) {
         ui.showLine();
         ui.showMessage("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
@@ -140,7 +139,7 @@ public class Sky {
         ui.showLine();
     }
 
-    private static void printAddMessage(ArrayList<Task> tasks) {
+    private static void printAddMessage(TaskList tasks) {
         ui.showLine();
         ui.showMessage("Got it. I've added this task:");
         ui.showMessage("    " + tasks.get(tasks.size() - 1));
