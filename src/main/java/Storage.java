@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.time.LocalDate;
 
 public class Storage {
 
@@ -61,10 +62,10 @@ public class Storage {
                 task = new Todo(parts[2]);
                 break;
             case "D":
-                task = new Deadline(parts[2], parts[3]);
+                task = new Deadline(parts[2], LocalDate.parse(parts[3]));
                 break;
             case "E":
-                task = new Event(parts[2], parts[3], parts[4]);
+                task = new Event(parts[2], LocalDate.parse(parts[3]), LocalDate.parse(parts[4]));
                 break;
             default:
                 throw new IllegalArgumentException("Invalid task type in file");
