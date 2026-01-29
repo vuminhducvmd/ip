@@ -1,32 +1,32 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Sky {
+    private static Ui ui;
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        ui = new Ui();
+        ui.showWelcome();
+
         ArrayList<Task> tasks = Storage.load();
 
-        System.out.println("____________________________________________");
-        System.out.println("Hello! I'm Sky");
-        System.out.println("What can I do for you?");
-        System.out.println("____________________________________________");
+        ui.showLine();
+        ui.showMessage("Hello! I'm Sky");
+        ui.showMessage("What can I do for you?");
+        ui.showLine();
 
         boolean isRunning = true;
 
         while (isRunning) {
-            String input = scanner.nextLine();
+            String input = ui.readCommand();
 
             try {
                 CommandType commandType = parseCommandType(input);
 
                 switch (commandType) {
                     case BYE ->     {
-                        System.out.println("____________________________________________");
-                        System.out.println("Bye. Hope to see you again soon!");
-                        System.out.println("____________________________________________");
+                        ui.showBye();
                         isRunning = false;;     
                     }
 
@@ -53,11 +53,11 @@ public class Sky {
                         Task removed = tasks.remove(index);
                         Storage.save(tasks);
 
-                        System.out.println("____________________________________________");
-                        System.out.println("Noted. I've removed this task:");
-                        System.out.println("    " + removed);
-                        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-                        System.out.println("____________________________________________");
+                        ui.showLine();
+                        ui.showMessage("Noted. I've removed this task:");
+                        ui.showMessage("    " + removed);
+                        ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
+                        ui.showLine();
                     }
 
                     case TODO ->  {
@@ -97,17 +97,16 @@ public class Sky {
                 }
 
             } catch (SkyException e) {
-                System.out.println("____________________________________________");
-                System.out.println("Oops! " + e.getMessage());
-                System.out.println("____________________________________________");
+                ui.showLine();
+                ui.showMessage("Oops! " + e.getMessage());
+                ui.showLine();
             } catch (IndexOutOfBoundsException e) {
-                System.out.println("____________________________________________");
-                System.out.println("Oops! That task number does not exist.");
-                System.out.println("____________________________________________");
+                ui.showLine();
+                ui.showMessage("Oops! That task number does not exist.");
+                ui.showLine();
             }
         }
 
-        scanner.close();
     }
 
     // ---------- helpers ----------
@@ -133,27 +132,27 @@ public class Sky {
     }
 
     private static void printList(ArrayList<Task> tasks) {
-        System.out.println("____________________________________________");
-        System.out.println("Here are the tasks in your list:");
+        ui.showLine();
+        ui.showMessage("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
-            System.out.println("    " + (i + 1) + "." + tasks.get(i));
+            ui.showMessage("    " + (i + 1) + "." + tasks.get(i));
         }
-        System.out.println("____________________________________________");
+        ui.showLine();
     }
 
     private static void printAddMessage(ArrayList<Task> tasks) {
-        System.out.println("____________________________________________");
-        System.out.println("Got it. I've added this task:");
-        System.out.println("    " + tasks.get(tasks.size() - 1));
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        System.out.println("____________________________________________");
+        ui.showLine();
+        ui.showMessage("Got it. I've added this task:");
+        ui.showMessage("    " + tasks.get(tasks.size() - 1));
+        ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
+        ui.showLine();
     }
 
     private static void printSingleTask(String message, Task task) {
-        System.out.println("____________________________________________");
-        System.out.println(message);
-        System.out.println("    " + task);
-        System.out.println("____________________________________________");
+        ui.showLine();
+        ui.showMessage(message);
+        ui.showMessage("    " + task);
+        ui.showLine();
     }
 
     private static CommandType parseCommandType(String input) {
