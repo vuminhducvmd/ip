@@ -1,3 +1,4 @@
+package sky;
 public enum CommandType {
     TODO,
     DEADLINE,

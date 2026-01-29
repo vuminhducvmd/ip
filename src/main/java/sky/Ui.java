@@ -1,3 +1,4 @@
+package sky;
 import java.util.Scanner;
 
 public class Ui {
