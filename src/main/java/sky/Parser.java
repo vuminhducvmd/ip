@@ -2,10 +2,17 @@ package sky;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+
+/**
+ * Parses user input into commands, indices, and dates.
+ */
 public class Parser {
 
     /**
      * Determines the command type from user input.
+     *
+     * @param input User input string
+     * @return Corresponding command type
      */
     public static CommandType parseCommandType(String input) {
         String trimmed = input.trim();
@@ -39,8 +46,12 @@ public class Parser {
     }
 
     /**
-     * Parses a 0-based task index using the command prefix length.
-     * Matches the original Sky.parseIndex(input, command) behavior.
+     * Parses a 0-based task index from user input.
+     *
+     * @param input Full user input
+     * @param command Command keyword
+     * @return Parsed task index (0-based)
+     * @throws SkyException If the index is invalid
      */
     public static int parseIndex(String input, String command) throws SkyException {
         try {
@@ -58,7 +69,12 @@ public class Parser {
     }
 
     /**
-     * Parses a yyyy-MM-dd date string into LocalDate.
+     * Parses a date string in yyyy-MM-dd format.
+     *
+     * @param value Date string to parse
+     * @param fieldName Name of the date field (for error messages)
+     * @return Parsed LocalDate
+     * @throws SkyException If the date format is invalid
      */
     public static LocalDate parseDate(String value, String fieldName) throws SkyException {
         try {

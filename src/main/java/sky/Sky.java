@@ -1,9 +1,21 @@
 package sky;
 import java.time.LocalDate;
 
+
+/**
+ * Entry point of the Sky task manager application.
+ * <p>
+ * Handles the main program loop, user input processing,
+ * and coordination between UI, storage, and task list.
+ */
 public class Sky {
     private static Ui ui;
 
+    /**
+     * Runs the Sky application.
+     *
+     * @param args Command-line arguments (not used)
+     */
     public static void main(String[] args) {
         ui = new Ui();
         ui.showWelcome();
@@ -111,6 +123,11 @@ public class Sky {
 
     // ---------- helpers ----------
 
+    /**
+     * Prints all tasks in the task list.
+     *
+     * @param tasks Task list to display
+     */
     private static void printList(TaskList tasks) {
         ui.showLine();
         ui.showMessage("Here are the tasks in your list:");
@@ -120,6 +137,11 @@ public class Sky {
         ui.showLine();
     }
 
+    /**
+     * Prints the confirmation message after adding a task.
+     *
+     * @param tasks Task list containing the newly added task
+     */
     private static void printAddMessage(TaskList tasks) {
         ui.showLine();
         ui.showMessage("Got it. I've added this task:");
@@ -128,6 +150,12 @@ public class Sky {
         ui.showLine();
     }
 
+    /**
+     * Prints a message followed by a single task.
+     *
+     * @param message Message to display
+     * @param task Task to display
+     */
     private static void printSingleTask(String message, Task task) {
         ui.showLine();
         ui.showMessage(message);
