@@ -8,7 +8,8 @@ public class Sky {
         ui = new Ui();
         ui.showWelcome();
         
-        TaskList tasks = new TaskList(Storage.load());
+        Storage storage = new Storage();
+        TaskList tasks = new TaskList(storage.load());
 
         ui.showLine();
         ui.showMessage("Hello! I'm Sky");
@@ -34,7 +35,7 @@ public class Sky {
                     case MARK ->  {
                         int index = Parser.parseIndex(input, "mark");
                         tasks.get(index).markAsDone();
-                        Storage.save(tasks);
+                        storage.save(tasks);
 
                         printSingleTask("Nice! I've marked this task as done:", tasks.get(index));
                     }
@@ -42,7 +43,7 @@ public class Sky {
                     case UNMARK ->  {
                         int index = Parser.parseIndex(input, "unmark");
                         tasks.get(index).markAsNotDone();
-                        Storage.save(tasks);
+                        storage.save(tasks);
 
                         printSingleTask("OK, I've marked this task as not done yet:", tasks.get(index));
                     }
@@ -50,7 +51,7 @@ public class Sky {
                     case DELETE ->  {
                         int index = Parser.parseIndex(input, "delete");
                         Task removed = tasks.remove(index);
-                        Storage.save(tasks);
+                        storage.save(tasks);
 
                         ui.showLine();
                         ui.showMessage("Noted. I've removed this task:");
@@ -65,7 +66,7 @@ public class Sky {
                             throw new SkyException("The description of a todo cannot be empty.");
                         }
                         tasks.add(new Todo(desc));
-                        Storage.save(tasks);
+                        storage.save(tasks);
                         printAddMessage(tasks);
                     }
 
@@ -76,7 +77,7 @@ public class Sky {
                         }
                         LocalDate by = Parser.parseDate(parts[1], "deadline /by");
                         tasks.add(new Deadline(parts[0], by));
-                        Storage.save(tasks);
+                        storage.save(tasks);
                         printAddMessage(tasks);
                     }
 
@@ -88,7 +89,7 @@ public class Sky {
                         LocalDate from = Parser.parseDate(parts[1], "event /from");
                         LocalDate to = Parser.parseDate(parts[2], "event /to");
                         tasks.add(new Event(parts[0], from, to));
-                        Storage.save(tasks);
+                        storage.save(tasks);
                         printAddMessage(tasks);
                     }
 
