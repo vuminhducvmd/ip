@@ -9,24 +9,31 @@ import java.util.Scanner;
 
 public class Storage {
 
-    private static final String DATA_DIR = "data";
-    private static final String FILE_PATH = DATA_DIR + File.separator + "sky.txt";
+    // private static final String DATA_DIR = "data";
+    // private static final String FILE_PATH = DATA_DIR + File.separator + "sky.txt";
+    private final File file;
 
-    public static ArrayList<Task> load() {
+    // Default constructor 
+    public Storage() {
+        this.file = new File("data" + File.separator + "sky.txt");
+    }
+
+    // Test constructor (JUnit use)
+    public Storage(File file) {
+        this.file = file;
+    }
+
+    public ArrayList<Task> load() {
         ArrayList<Task> tasks = new ArrayList<>();
-        File file = new File(FILE_PATH);
 
         if (!file.exists()) {
-            return tasks; // first run, nothing to load
+            return tasks;
         }
 
-        try {
-            Scanner fileScanner = new Scanner(file);
+        try (Scanner fileScanner = new Scanner(file)) {
             while (fileScanner.hasNextLine()) {
-                String line = fileScanner.nextLine();
-                tasks.add(parseTask(line));
+                tasks.add(parseTask(fileScanner.nextLine()));
             }
-            fileScanner.close();
         } catch (IOException e) {
             System.out.println("Warning: Could not load saved tasks.");
         }
@@ -34,18 +41,16 @@ public class Storage {
         return tasks;
     }
 
-    public static void save(TaskList tasks) {
-        try {
-            File dir = new File(DATA_DIR);
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
+    public void save(TaskList tasks) {
+        File parent = file.getParentFile();
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs();
+        }
 
-            PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH));
-            for (int i = 0; i < tasks.size(); i++)  {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
+            for (int i = 0; i < tasks.size(); i++) {
                 writer.println(tasks.get(i).toDataString());
             }
-            writer.close();
         } catch (IOException e) {
             System.out.println("Warning: Could not save tasks.");
         }
