@@ -1,5 +1,6 @@
 package sky;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 
 /**
@@ -43,6 +44,14 @@ public class Sky {
                     }
 
                     case LIST -> printList(tasks);
+
+                    case FIND -> {
+                        String keyword = input.substring(4).trim();
+                        if (keyword.isEmpty()) {
+                            throw new SkyException("Please provide a keyword to search for.");
+                        }
+                        printFindResults(tasks.find(keyword));
+                    }
 
                     case MARK ->  {
                         int index = Parser.parseIndex(input, "mark");
@@ -163,4 +172,14 @@ public class Sky {
         ui.showLine();
     }
 
+    private static void printFindResults(ArrayList<Task> matches) {
+        ui.showLine();
+        ui.showMessage("Here are the matching tasks in your list:");
+
+        for (int i = 0; i < matches.size(); i++) {
+            ui.showMessage("    " + (i + 1) + "." + matches.get(i));
+        }
+
+        ui.showLine();
+    }
 }

@@ -41,6 +41,9 @@ public class Parser {
         if (trimmed.equals("bye")) {
             return CommandType.BYE;
         }
+        if (trimmed.startsWith("find")) {
+            return CommandType.FIND;
+        }
 
         return CommandType.UNKNOWN;
     }
