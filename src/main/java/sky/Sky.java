@@ -1,185 +1,129 @@
 package sky;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-
 /**
- * Entry point of the Sky task manager application.
+ * Core logic engine for the Sky task manager.
  * <p>
- * Handles the main program loop, user input processing,
- * and coordination between UI, storage, and task list.
+ * This class is UI-agnostic and can be used by both
+ * CLI and GUI frontends.
  */
 public class Sky {
-    private static Ui ui;
+
+    private final TaskList tasks;
+    private final Storage storage;
 
     /**
-     * Runs the Sky application.
+     * Constructs a Sky instance using the given storage file.
      *
-     * @param args Command-line arguments (not used)
+     * @param filePath Path to the storage file
      */
-    public static void main(String[] args) {
-        ui = new Ui();
-        ui.showWelcome();
-        
-        Storage storage = new Storage();
-        TaskList tasks = new TaskList(storage.load());
-
-        ui.showLine();
-        ui.showMessage("Hello! I'm Sky");
-        ui.showMessage("What can I do for you?");
-        ui.showLine();
-
-        boolean isRunning = true;
-
-        while (isRunning) {
-            String input = ui.readCommand();
-
-            try {
-                CommandType commandType = Parser.parseCommandType(input);
-
-                switch (commandType) {
-                    case BYE ->     {
-                        ui.showBye();
-                        isRunning = false;;     
-                    }
-
-                    case LIST -> printList(tasks);
-
-                    case FIND -> {
-                        String keyword = input.substring(4).trim();
-                        if (keyword.isEmpty()) {
-                            throw new SkyException("Please provide a keyword to search for.");
-                        }
-                        printFindResults(tasks.find(keyword));
-                    }
-
-                    case MARK ->  {
-                        int index = Parser.parseIndex(input, "mark");
-                        tasks.get(index).markAsDone();
-                        storage.save(tasks);
-
-                        printSingleTask("Nice! I've marked this task as done:", tasks.get(index));
-                    }
-
-                    case UNMARK ->  {
-                        int index = Parser.parseIndex(input, "unmark");
-                        tasks.get(index).markAsNotDone();
-                        storage.save(tasks);
-
-                        printSingleTask("OK, I've marked this task as not done yet:", tasks.get(index));
-                    }
-
-                    case DELETE ->  {
-                        int index = Parser.parseIndex(input, "delete");
-                        Task removed = tasks.remove(index);
-                        storage.save(tasks);
-
-                        ui.showLine();
-                        ui.showMessage("Noted. I've removed this task:");
-                        ui.showMessage("    " + removed);
-                        ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
-                        ui.showLine();
-                    }
-
-                    case TODO ->  {
-                        String desc = input.substring(4).trim();
-                        if (desc.isEmpty()) {
-                            throw new SkyException("The description of a todo cannot be empty.");
-                        }
-                        tasks.add(new Todo(desc));
-                        storage.save(tasks);
-                        printAddMessage(tasks);
-                    }
-
-                    case DEADLINE ->  {
-                        String[] parts = input.substring(8).trim().split(" /by ", 2);
-                        if (parts.length < 2 || parts[0].isBlank()) {
-                            throw new SkyException("A deadline must have a description and /by <time>.");
-                        }
-                        LocalDate by = Parser.parseDate(parts[1], "deadline /by");
-                        tasks.add(new Deadline(parts[0], by));
-                        storage.save(tasks);
-                        printAddMessage(tasks);
-                    }
-
-                    case EVENT ->  {
-                        String[] parts = input.substring(5).trim().split(" /from | /to ");
-                        if (parts.length < 3 || parts[0].isBlank()) {
-                            throw new SkyException("An event must have /from <start> /to <end>.");
-                        }
-                        LocalDate from = Parser.parseDate(parts[1], "event /from");
-                        LocalDate to = Parser.parseDate(parts[2], "event /to");
-                        tasks.add(new Event(parts[0], from, to));
-                        storage.save(tasks);
-                        printAddMessage(tasks);
-                    }
-
-                    case UNKNOWN -> throw new SkyException("I don't understand that command.");
-                }
-
-            } catch (SkyException e) {
-                ui.showLine();
-                ui.showMessage("Oops! " + e.getMessage());
-                ui.showLine();
-            } catch (IndexOutOfBoundsException e) {
-                ui.showLine();
-                ui.showMessage("Oops! That task number does not exist.");
-                ui.showLine();
-            }
-        }
-
+    public Sky(String filePath) {
+        this.storage = new Storage();
+        this.tasks = new TaskList(storage.load());
     }
 
-    // ---------- helpers ----------
-
     /**
-     * Prints all tasks in the task list.
+     * Processes a user command and returns Sky's response.
      *
-     * @param tasks Task list to display
+     * @param input User command
+     * @return Response message to be displayed
+     * @throws SkyException If command is invalid
      */
-    private static void printList(TaskList tasks) {
-        ui.showLine();
-        ui.showMessage("Here are the tasks in your list:");
+    public String getResponse(String input) throws SkyException {
+        CommandType commandType = Parser.parseCommandType(input);
+
+        return switch (commandType) {
+            case BYE -> "Bye. Hope to see you again soon!";
+            case LIST -> formatList();
+            case FIND -> handleFind(input);
+            case MARK -> handleMark(input);
+            case UNMARK -> handleUnmark(input);
+            case DELETE -> handleDelete(input);
+            case TODO -> handleTodo(input);
+            case DEADLINE -> handleDeadline(input);
+            case EVENT -> handleEvent(input);
+            case UNKNOWN -> throw new SkyException("I don't understand that command.");
+        };
+    }
+
+    // ---------- command handlers ----------
+
+    private String formatList() {
+        StringBuilder sb = new StringBuilder("Here are the tasks in your list:\n");
         for (int i = 0; i < tasks.size(); i++) {
-            ui.showMessage("    " + (i + 1) + "." + tasks.get(i));
+            sb.append(i + 1).append(". ").append(tasks.get(i)).append("\n");
         }
-        ui.showLine();
+        return sb.toString();
     }
 
-    /**
-     * Prints the confirmation message after adding a task.
-     *
-     * @param tasks Task list containing the newly added task
-     */
-    private static void printAddMessage(TaskList tasks) {
-        ui.showLine();
-        ui.showMessage("Got it. I've added this task:");
-        ui.showMessage("    " + tasks.get(tasks.size() - 1));
-        ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
-        ui.showLine();
-    }
+    private String handleFind(String input) throws SkyException {
+        String keyword = input.substring(4).trim();
+        if (keyword.isEmpty()) {
+            throw new SkyException("Please provide a keyword to search for.");
+        }
+        ArrayList<Task> matches = tasks.find(keyword);
 
-    /**
-     * Prints a message followed by a single task.
-     *
-     * @param message Message to display
-     * @param task Task to display
-     */
-    private static void printSingleTask(String message, Task task) {
-        ui.showLine();
-        ui.showMessage(message);
-        ui.showMessage("    " + task);
-        ui.showLine();
-    }
-
-    private static void printFindResults(ArrayList<Task> matches) {
-        ui.showLine();
-        ui.showMessage("Here are the matching tasks in your list:");
-
+        StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:\n");
         for (int i = 0; i < matches.size(); i++) {
-            ui.showMessage("    " + (i + 1) + "." + matches.get(i));
+            sb.append(i + 1).append(". ").append(matches.get(i)).append("\n");
         }
+        return sb.toString();
+    }
 
-        ui.showLine();
+    private String handleMark(String input) throws SkyException {
+        int index = Parser.parseIndex(input, "mark");
+        tasks.get(index).markAsDone();
+        storage.save(tasks);
+        return "Nice! I've marked this task as done:\n  " + tasks.get(index);
+    }
+
+    private String handleUnmark(String input) throws SkyException {
+        int index = Parser.parseIndex(input, "unmark");
+        tasks.get(index).markAsNotDone();
+        storage.save(tasks);
+        return "OK, I've marked this task as not done yet:\n  " + tasks.get(index);
+    }
+
+    private String handleDelete(String input) throws SkyException {
+        int index = Parser.parseIndex(input, "delete");
+        Task removed = tasks.remove(index);
+        storage.save(tasks);
+        return "Noted. I've removed this task:\n  " + removed
+                + "\nNow you have " + tasks.size() + " tasks in the list.";
+    }
+
+    private String handleTodo(String input) throws SkyException {
+        String desc = input.substring(4).trim();
+        if (desc.isEmpty()) {
+            throw new SkyException("The description of a todo cannot be empty.");
+        }
+        tasks.add(new Todo(desc));
+        storage.save(tasks);
+        return "Got it. I've added this task:\n  " + tasks.get(tasks.size() - 1);
+    }
+
+    private String handleDeadline(String input) throws SkyException {
+        String[] parts = input.substring(8).trim().split(" /by ", 2);
+        if (parts.length < 2) {
+            throw new SkyException("A deadline must have /by <time>.");
+        }
+        LocalDate by = Parser.parseDate(parts[1], "deadline /by");
+        tasks.add(new Deadline(parts[0], by));
+        storage.save(tasks);
+        return "Got it. I've added this task:\n  " + tasks.get(tasks.size() - 1);
+    }
+
+    private String handleEvent(String input) throws SkyException {
+        String[] parts = input.substring(5).trim().split(" /from | /to ");
+        if (parts.length < 3) {
+            throw new SkyException("An event must have /from <start> /to <end>.");
+        }
+        LocalDate from = Parser.parseDate(parts[1], "event /from");
+        LocalDate to = Parser.parseDate(parts[2], "event /to");
+        tasks.add(new Event(parts[0], from, to));
+        storage.save(tasks);
+        return "Got it. I've added this task:\n  " + tasks.get(tasks.size() - 1);
     }
 }
