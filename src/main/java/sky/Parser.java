@@ -15,6 +15,8 @@ public class Parser {
      * @return Corresponding command type
      */
     public static CommandType parseCommandType(String input) {
+        assert input != null : "Parser.parseCommandType: input should not be null";
+
         String trimmed = input.trim();
 
         // Commands with exact match
@@ -59,8 +61,11 @@ public class Parser {
      * @return Parsed task index (0-based)
      * @throws SkyException If the index is invalid
      */
-    public static int parseIndex(String input, String command)
-            throws SkyException {
+    public static int parseIndex(String input, String command) throws SkyException {
+        assert input != null : "Parser.parseIndex: input should not be null";
+        assert command != null : "Parser.parseIndex: command should not be null";
+        assert input.startsWith(command)
+                : "Parser.parseIndex: input must start with command";
 
         String argument = input.substring(command.length()).trim();
 
@@ -90,8 +95,9 @@ public class Parser {
      * @return Parsed LocalDate
      * @throws SkyException If the date format is invalid
      */
-    public static LocalDate parseDate(String value, String fieldName)
-            throws SkyException {
+    public static LocalDate parseDate(String value, String fieldName) throws SkyException {
+        assert value != null : "Parser.parseDate: value should not be null";
+        assert fieldName != null : "Parser.parseDate: fieldName should not be null";
 
         try {
             return LocalDate.parse(value.trim());

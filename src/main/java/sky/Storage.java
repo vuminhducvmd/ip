@@ -107,6 +107,8 @@ public class Storage {
      */
     private static Task parseTask(String line) {
 
+        assert line != null : "Storage.parseTask: line should not be null";
+
         String[] parts = line.split(" \\| ");
 
         if (parts.length < 3) {
@@ -120,6 +122,12 @@ public class Storage {
         String type = parts[IDX_TYPE];
         String description = parts[IDX_DESC];
 
+        assert parts.length >= 3
+            : "Storage.parseTask: invalid file format";
+
+        assert parts.length >= 3
+            : "Storage.parseTask: invalid file format";
+
         Task task;
 
         switch (type) {
@@ -128,6 +136,8 @@ public class Storage {
             break;
 
         case "D":
+                assert parts.length == 4
+                    : "Deadline format should have 4 fields";
             if (parts.length != 4) {
                 throw new IllegalArgumentException(
                     "Invalid deadline format in storage file."
@@ -140,6 +150,8 @@ public class Storage {
             break;
 
         case "E":
+                assert parts.length == 5
+                    : "Event format should have 5 fields";
             if (parts.length != 5) {
                 throw new IllegalArgumentException(
                     "Invalid event format in storage file."
