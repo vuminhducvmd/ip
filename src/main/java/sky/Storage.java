@@ -14,6 +14,14 @@ import java.util.Scanner;
  */
 public class Storage {
 
+    private static final String DONE_MARKER = "1";
+
+    private static final int IDX_TYPE = 0;
+    private static final int IDX_DONE = 1;
+    private static final int IDX_DESC = 2;
+    private static final int IDX_DATE1 = 3;
+    private static final int IDX_DATE2 = 4;
+
     private final File file;
 
     /**
@@ -48,10 +56,14 @@ public class Storage {
 
         try (Scanner fileScanner = new Scanner(file)) {
             while (fileScanner.hasNextLine()) {
-                tasks.add(parseTask(fileScanner.nextLine()));
+                String line = fileScanner.nextLine();
+                tasks.add(parseTask(line));
             }
         } catch (IOException e) {
-            System.out.println("Warning: Could not load saved tasks.");
+            System.err.println(
+                "Warning: Could not load saved tasks: "
+                + e.getMessage()
+            );
         }
 
         return tasks;
@@ -68,12 +80,19 @@ public class Storage {
             parent.mkdirs();
         }
 
-        try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
+        try (PrintWriter writer = new PrintWriter(
+                new FileWriter(file))) {
+
             for (int i = 0; i < tasks.size(); i++) {
-                writer.println(tasks.get(i).toDataString());
+                Task task = tasks.get(i);
+                writer.println(task.toDataString());
             }
+
         } catch (IOException e) {
-            System.out.println("Warning: Could not save tasks.");
+            System.err.println(
+                "Warning: Could not save tasks: "
+                + e.getMessage()
+            );
         }
     }
 
@@ -87,36 +106,74 @@ public class Storage {
      * @throws IllegalArgumentException If the task type is invalid
      */
     private static Task parseTask(String line) {
+
         assert line != null : "Storage.parseTask: line should not be null";
 
         String[] parts = line.split(" \\| ");
-        boolean isDone = parts[1].equals("1");
+
+        if (parts.length < 3) {
+            throw new IllegalArgumentException(
+                "Corrupted task data in storage file."
+            );
+        }
+
+        boolean isDone = DONE_MARKER.equals(parts[IDX_DONE]);
+
+        String type = parts[IDX_TYPE];
+        String description = parts[IDX_DESC];
+
+        assert parts.length >= 3
+            : "Storage.parseTask: invalid file format";
 
         assert parts.length >= 3
             : "Storage.parseTask: invalid file format";
 
         Task task;
-        switch (parts[0]) {
-            case "T":
-                task = new Todo(parts[2]);
-                break;
-            case "D":
+
+        switch (type) {
+        case "T":
+            task = new Todo(description);
+            break;
+
+        case "D":
                 assert parts.length == 4
                     : "Deadline format should have 4 fields";
-                task = new Deadline(parts[2], LocalDate.parse(parts[3]));
-                break;
-            case "E":
+            if (parts.length != 4) {
+                throw new IllegalArgumentException(
+                    "Invalid deadline format in storage file."
+                );
+            }
+            task = new Deadline(
+                description,
+                LocalDate.parse(parts[IDX_DATE1])
+            );
+            break;
+
+        case "E":
                 assert parts.length == 5
                     : "Event format should have 5 fields";
-                task = new Event(parts[2], LocalDate.parse(parts[3]), LocalDate.parse(parts[4]));
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid task type in file");
+            if (parts.length != 5) {
+                throw new IllegalArgumentException(
+                    "Invalid event format in storage file."
+                );
+            }
+            task = new Event(
+                description,
+                LocalDate.parse(parts[IDX_DATE1]),
+                LocalDate.parse(parts[IDX_DATE2])
+            );
+            break;
+
+        default:
+            throw new IllegalArgumentException(
+                "Invalid task type in storage file."
+            );
         }
 
         if (isDone) {
             task.markAsDone();
         }
+
         return task;
     }
 }
