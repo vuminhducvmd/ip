@@ -19,6 +19,15 @@ public class Parser {
 
         String trimmed = input.trim();
 
+        // Commands with exact match
+        if (trimmed.equals("list")) {
+            return CommandType.LIST;
+        }
+        if (trimmed.equals("bye")) {
+            return CommandType.BYE;
+        }
+
+        // Commands with prefixes
         if (trimmed.startsWith("todo")) {
             return CommandType.TODO;
         }
@@ -28,20 +37,14 @@ public class Parser {
         if (trimmed.startsWith("event")) {
             return CommandType.EVENT;
         }
-        if (trimmed.equals("list")) {
-            return CommandType.LIST;
+        if (trimmed.startsWith("unmark")) {
+            return CommandType.UNMARK;
         }
         if (trimmed.startsWith("mark")) {
             return CommandType.MARK;
         }
-        if (trimmed.startsWith("unmark")) {
-            return CommandType.UNMARK;
-        }
         if (trimmed.startsWith("delete")) {
             return CommandType.DELETE;
-        }
-        if (trimmed.equals("bye")) {
-            return CommandType.BYE;
         }
         if (trimmed.startsWith("find")) {
             return CommandType.FIND;
@@ -64,18 +67,24 @@ public class Parser {
         assert input.startsWith(command)
                 : "Parser.parseIndex: input must start with command";
 
-        try {
-            int index = Integer.parseInt(
-                    input.substring(command.length()).trim()
-            ) - 1;
+        String argument = input.substring(command.length()).trim();
 
-            if (index < 0) {
-                throw new SkyException("Task number must be positive.");
-            }
-            return index;
+        if (argument.isEmpty()) {
+            throw new SkyException("Please provide a task number.");
+        }
+
+        int index;
+        try {
+            index = Integer.parseInt(argument) - 1;
         } catch (NumberFormatException e) {
             throw new SkyException("Please provide a valid task number.");
         }
+
+        if (index < 0) {
+            throw new SkyException("Task number must be positive.");
+        }
+
+        return index;
     }
 
     /**
@@ -88,14 +97,14 @@ public class Parser {
      */
     public static LocalDate parseDate(String value, String fieldName) throws SkyException {
         assert value != null : "Parser.parseDate: value should not be null";
-    assert fieldName != null : "Parser.parseDate: fieldName should not be null";
+        assert fieldName != null : "Parser.parseDate: fieldName should not be null";
 
         try {
             return LocalDate.parse(value.trim());
         } catch (DateTimeParseException e) {
             throw new SkyException(
                 "Invalid " + fieldName
-                + " date. Use yyyy-mm-dd (e.g., 2019-10-15)."
+                + " date. Use yyyy-MM-dd (e.g., 2019-10-15)."
             );
         }
     }
