@@ -1,5 +1,6 @@
 package sky;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 
 /**
@@ -81,14 +82,8 @@ public class TaskList {
      * @return List of matching tasks
      */
     public ArrayList<Task> find(String keyword) {
-        ArrayList<Task> matches = new ArrayList<>();
-
-        for (Task task : tasks) {
-            if (task.getDescription().contains(keyword)) {
-                matches.add(task);
-            }
-        }
-
-        return matches;
+        return tasks.stream()
+                .filter(task -> task.getDescription().contains(keyword))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }

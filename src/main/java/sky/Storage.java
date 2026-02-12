@@ -69,9 +69,9 @@ public class Storage {
         }
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
-            for (int i = 0; i < tasks.size(); i++) {
-                writer.println(tasks.get(i).toDataString());
-            }
+            tasks.asList().stream()
+                .map(Task::toDataString)
+                .forEach(writer::println);
         } catch (IOException e) {
             System.out.println("Warning: Could not save tasks.");
         }
