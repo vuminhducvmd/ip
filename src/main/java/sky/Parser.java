@@ -15,6 +15,8 @@ public class Parser {
      * @return Corresponding command type
      */
     public static CommandType parseCommandType(String input) {
+        assert input != null : "Parser.parseCommandType: input should not be null";
+
         String trimmed = input.trim();
 
         if (trimmed.startsWith("todo")) {
@@ -57,6 +59,11 @@ public class Parser {
      * @throws SkyException If the index is invalid
      */
     public static int parseIndex(String input, String command) throws SkyException {
+        assert input != null : "Parser.parseIndex: input should not be null";
+        assert command != null : "Parser.parseIndex: command should not be null";
+        assert input.startsWith(command)
+                : "Parser.parseIndex: input must start with command";
+
         try {
             int index = Integer.parseInt(
                     input.substring(command.length()).trim()
@@ -80,6 +87,9 @@ public class Parser {
      * @throws SkyException If the date format is invalid
      */
     public static LocalDate parseDate(String value, String fieldName) throws SkyException {
+        assert value != null : "Parser.parseDate: value should not be null";
+    assert fieldName != null : "Parser.parseDate: fieldName should not be null";
+
         try {
             return LocalDate.parse(value.trim());
         } catch (DateTimeParseException e) {
