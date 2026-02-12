@@ -87,8 +87,13 @@ public class Storage {
      * @throws IllegalArgumentException If the task type is invalid
      */
     private static Task parseTask(String line) {
+        assert line != null : "Storage.parseTask: line should not be null";
+
         String[] parts = line.split(" \\| ");
         boolean isDone = parts[1].equals("1");
+
+        assert parts.length >= 3
+            : "Storage.parseTask: invalid file format";
 
         Task task;
         switch (parts[0]) {
@@ -96,9 +101,13 @@ public class Storage {
                 task = new Todo(parts[2]);
                 break;
             case "D":
+                assert parts.length == 4
+                    : "Deadline format should have 4 fields";
                 task = new Deadline(parts[2], LocalDate.parse(parts[3]));
                 break;
             case "E":
+                assert parts.length == 5
+                    : "Event format should have 5 fields";
                 task = new Event(parts[2], LocalDate.parse(parts[3]), LocalDate.parse(parts[4]));
                 break;
             default:
