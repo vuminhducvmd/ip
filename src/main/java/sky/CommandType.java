@@ -13,5 +13,6 @@ public enum CommandType {
     UNMARK,
     DELETE,
     BYE,
+    UPDATE,
     UNKNOWN
 }

@@ -49,6 +49,9 @@ public class Parser {
         if (trimmed.startsWith("find")) {
             return CommandType.FIND;
         }
+        if (trimmed.startsWith("update")) {
+            return CommandType.UPDATE;
+        }
 
         return CommandType.UNKNOWN;
     }

@@ -44,6 +44,7 @@ public class Sky {
             case TODO -> handleTodo(input);
             case DEADLINE -> handleDeadline(input);
             case EVENT -> handleEvent(input);
+            case UPDATE -> handleUpdate(input);
             case UNKNOWN -> throw new SkyException("I don't understand that command.");
         };
     }
@@ -92,6 +93,41 @@ public class Sky {
         storage.save(tasks);
         return "Noted. I've removed this task:\n  " + removed
                 + "\nNow you have " + tasks.size() + " tasks in the list.";
+    }
+
+    private String handleUpdate(String input) throws SkyException {
+        String[] parts = input.split(" ", 3);
+
+        if (parts.length < 3) {
+            throw new SkyException(
+                "Usage: update <task number> <new description>"
+            );
+        }
+
+        int index;
+        try {
+            index = Integer.parseInt(parts[1]) - 1;
+        } catch (NumberFormatException e) {
+            throw new SkyException("Please provide a valid task number.");
+        }
+
+        if (index < 0 || index >= tasks.size()) {
+            throw new SkyException("Task number is out of range.");
+        }
+
+        String newDescription = parts[2].trim();
+        if (newDescription.isEmpty()) {
+            throw new SkyException(
+                "The updated description cannot be empty."
+            );
+        }
+
+        Task task = tasks.get(index);
+        task.setDescription(newDescription);
+
+        storage.save(tasks);
+
+        return "Got it. I've updated this task:\n  " + task;
     }
 
     private String handleTodo(String input) throws SkyException {

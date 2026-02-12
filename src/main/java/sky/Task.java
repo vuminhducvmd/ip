@@ -54,6 +54,16 @@ public abstract class Task {
     }
 
     /**
+     * Set the description of this task.
+     *
+     * @param newDescription
+     */
+    public void setDescription(String newDescription) {
+        assert newDescription != null : "Description cannot be null";
+        this.description = newDescription;
+    }
+
+    /**
      * Returns a user-facing string representation of this task.
      *
      * @return Formatted string representing the task
