@@ -80,14 +80,10 @@ public class Storage {
             parent.mkdirs();
         }
 
-        try (PrintWriter writer = new PrintWriter(
-                new FileWriter(file))) {
-
-            for (int i = 0; i < tasks.size(); i++) {
-                Task task = tasks.get(i);
-                writer.println(task.toDataString());
-            }
-
+        try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
+            tasks.asList().stream()
+                .map(Task::toDataString)
+                .forEach(writer::println);
         } catch (IOException e) {
             System.err.println(
                 "Warning: Could not save tasks: "
