@@ -22,6 +22,10 @@ public class Deadline extends Task {
         this.by = by;
     }
 
+    public void updateBy(LocalDate newDate) {
+        this.by = newDate;
+    }
+
     /**
      * Returns a user-facing string representation of this deadline task.
      *

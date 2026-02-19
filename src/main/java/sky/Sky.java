@@ -96,12 +96,10 @@ public class Sky {
     }
 
     private String handleUpdate(String input) throws SkyException {
-        String[] parts = input.split(" ", 3);
+        String[] parts = input.split(" ", 4);
 
-        if (parts.length < 3) {
-            throw new SkyException(
-                "Usage: update <task number> <new description>"
-            );
+        if (parts.length < 4) {
+            throw new SkyException("Usage: update <index> <field> <value>");
         }
 
         int index;
@@ -112,22 +110,47 @@ public class Sky {
         }
 
         if (index < 0 || index >= tasks.size()) {
-            throw new SkyException("Task number is out of range.");
+            throw new SkyException("Please provide a valid task number.");
         }
 
-        String newDescription = parts[2].trim();
-        if (newDescription.isEmpty()) {
-            throw new SkyException(
-                "The updated description cannot be empty."
-            );
-        }
+        String field = parts[2];
+        String value = parts[3];
 
         Task task = tasks.get(index);
-        task.setDescription(newDescription);
+
+        switch (field) {
+        case "/desc":
+            task.updateDescription(value);
+            break;
+
+        case "/by":
+            if (!(task instanceof Deadline deadline)) {
+                throw new SkyException("Only deadlines support /by updates.");
+            }
+            deadline.updateBy(Parser.parseDate(value, "update by"));
+            break;
+
+        case "/from":
+            if (!(task instanceof Event event)) {
+                throw new SkyException("Only events support /from updates.");
+            }
+            event.updateFrom(Parser.parseDate(value, "update from"));
+            break;
+
+        case "/to":
+            if (!(task instanceof Event event)) {
+                throw new SkyException("Only events support /to updates.");
+            }
+            event.updateTo(Parser.parseDate(value, "update to"));
+            break;
+
+        default:
+            throw new SkyException("Unknown field. Use desc, by, from, or to.");
+        }
 
         storage.save(tasks);
 
-        return "Got it. I've updated this task:\n  " + task;
+        return "Updated task:\n  " + task;
     }
 
     private String handleTodo(String input) throws SkyException {

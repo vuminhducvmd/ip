@@ -53,13 +53,10 @@ public abstract class Task {
         return description;
     }
 
-    /**
-     * Set the description of this task.
-     *
-     * @param newDescription
-     */
-    public void setDescription(String newDescription) {
-        assert newDescription != null : "Description cannot be null";
+    public void updateDescription(String newDescription) {
+        if (newDescription == null || newDescription.isBlank()) {
+            throw new IllegalArgumentException("Description cannot be empty.");
+        }
         this.description = newDescription;
     }
 

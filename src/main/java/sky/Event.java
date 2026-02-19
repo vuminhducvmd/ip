@@ -25,6 +25,18 @@ public class Event extends Task {
         this.to = to;
     }
 
+    public void updateFrom(LocalDate newFrom) {
+        if (newFrom.isAfter(this.to)) {
+            throw new IllegalArgumentException("Start date cannot be after end date.");
+        }
+        
+        this.from = newFrom;
+    }
+
+    public void updateTo(LocalDate newTo) {
+        this.to = newTo;
+    }
+
     /**
      * Returns a user-facing string representation of this event task.
      *
