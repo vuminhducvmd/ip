@@ -23,6 +23,8 @@ public class MainApp extends Application {
         // inject Sky into controller
         loader.<sky.gui.controller.MainWindow>getController().setSky(sky);
 
+        stage.setTitle("Sky");
+        
         stage.show();
     }
 }
