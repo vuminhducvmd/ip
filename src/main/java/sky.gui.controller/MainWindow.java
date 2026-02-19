@@ -25,8 +25,8 @@ public class MainWindow extends AnchorPane {
 
     private final Image userImage =
             new Image(getClass().getResourceAsStream("/images/DaUser.png"));
-    private final Image dukeImage =
-            new Image(getClass().getResourceAsStream("/images/DaDuke.png"));
+    private final Image skyImage =
+            new Image(getClass().getResourceAsStream("/images/DaSky.png"));
 
     @FXML
     public void initialize() {
@@ -40,6 +40,14 @@ public class MainWindow extends AnchorPane {
      */
     public void setSky(Sky sky) {
         this.sky = sky;
+
+        dialogContainer.getChildren().add(
+            DialogBox.getSkyDialog(
+                "Hello! I'm Sky\n" +
+                "How can I help you today?",
+                skyImage
+            )
+        );
     }
 
     @FXML
@@ -49,12 +57,16 @@ public class MainWindow extends AnchorPane {
             String response = sky.getResponse(input);
             dialogContainer.getChildren().addAll(
                     DialogBox.getUserDialog(input, userImage),
-                    DialogBox.getDukeDialog(response, dukeImage)
+                    DialogBox.getSkyDialog(response, skyImage)
             );
         } catch (SkyException e) {
-            dialogContainer.getChildren().add(
-                    DialogBox.getDukeDialog("Oops! " + e.getMessage(), dukeImage)
-            );
+            DialogBox errorBox =
+                    DialogBox.getSkyDialog("Oops! " + e.getMessage(), skyImage);
+
+            errorBox.setStyle("-fx-background-color: #FFDDDD;");
+
+            dialogContainer.getChildren().add(errorBox);
+
         }
         userInput.clear();
     }

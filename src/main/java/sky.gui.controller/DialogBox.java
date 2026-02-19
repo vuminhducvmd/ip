@@ -36,6 +36,27 @@ public class DialogBox extends HBox {
 
         dialog.setText(text);
         displayPicture.setImage(img);
+
+        displayPicture.setFitWidth(40);
+        displayPicture.setFitHeight(40);
+        displayPicture.setPreserveRatio(true);
+
+        // Make it circular
+        displayPicture.setClip(
+                new javafx.scene.shape.Circle(20, 20, 20)
+        );
+
+        dialog.setWrapText(true);
+        dialog.setMaxWidth(500);
+        dialog.setStyle(
+                "-fx-background-color: #E8E8E8;" +
+                "-fx-padding: 8;" +
+                "-fx-background-radius: 10;"
+        );
+
+        dialog.maxWidthProperty().bind(
+            this.widthProperty().multiply(0.6)
+        );
     }
 
     /**
@@ -49,10 +70,16 @@ public class DialogBox extends HBox {
     }
 
     public static DialogBox getUserDialog(String text, Image img) {
-        return new DialogBox(text, img);
+        var db = new DialogBox(text, img);
+        db.dialog.setStyle(
+                "-fx-background-color: #DCF8C6;" +
+                "-fx-padding: 8;" +
+                "-fx-background-radius: 10;"
+        );
+        return db;
     }
 
-    public static DialogBox getDukeDialog(String text, Image img) {
+    public static DialogBox getSkyDialog(String text, Image img) {
         var db = new DialogBox(text, img);
         db.flip();
         return db;
