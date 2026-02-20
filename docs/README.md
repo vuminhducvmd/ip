@@ -65,12 +65,12 @@ update <task number> /desc <new description>
 ```
 Example
 ```
-update 1 desc read comic
+update 1 /desc read comic
 ```
 
 ### Update Deadline Date
 ```
-update <task number> by <yyyy-mm-dd>
+update <task number> /by <yyyy-mm-dd>
 ```
 Example
 ```
