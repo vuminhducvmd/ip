@@ -7,10 +7,18 @@ It helps you manage todos, deadlines, and events efficiently.
 
 ---
 
-## 🚀 Getting Started
+## Quick Start
 
-When you launch Sky, you will see a welcome message.
-Type a command into the input box and press Enter or click **Send**.
+1. Ensure you have **Java 17** installed on your computer.
+2. Download the latest **sky.jar** from the project's Release page.
+3. Copy the jar file into any folder you want to use.
+4. Open a terminal in that folder.
+5. Run the application:
+```
+java -jar sky.jar
+```
+6. The Sky GUI will appear.
+7. Type commands into the input box and press **Enter**.
 
 ---
 
@@ -138,3 +146,20 @@ find book
 ```
 bye
 ```
+
+---
+
+## Command Summary
+
+| Action | Format |
+|------|------|
+| List tasks | `list` |
+| Add todo | `todo <description>` |
+| Add deadline | `deadline <description> /by <yyyy-mm-dd>` |
+| Add event | `event <description> /from <yyyy-mm-dd> /to <yyyy-mm-dd>` |
+| Update task | `update <task number> <field>` |
+| Mark task | `mark <task number>` |
+| Unmark task | `unmark <task number>` |
+| Delete task | `delete <task number>` |
+| Find tasks | `find <keyword>` |
+| Exit | `bye` |
