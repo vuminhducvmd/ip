@@ -55,18 +55,36 @@ public class MainWindow extends AnchorPane {
         String input = userInput.getText();
         try {
             String response = sky.getResponse(input);
+
             dialogContainer.getChildren().addAll(
                     DialogBox.getUserDialog(input, userImage),
                     DialogBox.getSkyDialog(response, skyImage)
             );
+
         } catch (SkyException e) {
             DialogBox errorBox =
                     DialogBox.getSkyDialog("Oops! " + e.getMessage(), skyImage);
 
             errorBox.setStyle("-fx-background-color: #FFDDDD;");
 
-            dialogContainer.getChildren().add(errorBox);
+            dialogContainer.getChildren().addAll(
+                    DialogBox.getUserDialog(input, userImage),
+                    errorBox
+            );
 
+        } catch (Exception e) {
+            DialogBox errorBox =
+                    DialogBox.getSkyDialog(
+                            "Oops! Something went wrong. Please check the command format.",
+                            skyImage
+                    );
+
+            errorBox.setStyle("-fx-background-color: #FFDDDD;");
+
+            dialogContainer.getChildren().addAll(
+                    DialogBox.getUserDialog(input, userImage),
+                    errorBox
+            );
         }
         userInput.clear();
     }
