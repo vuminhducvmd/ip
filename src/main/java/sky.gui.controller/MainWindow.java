@@ -1,11 +1,14 @@
 package sky.gui.controller;
 
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import sky.Sky;
 import sky.SkyException;
 
@@ -61,6 +64,12 @@ public class MainWindow extends AnchorPane {
                     DialogBox.getSkyDialog(response, skyImage)
             );
 
+            // close application after showing bye message
+            if (input.trim().equals("bye")) {
+                PauseTransition delay = new PauseTransition(Duration.seconds(1.5));
+                delay.setOnFinished(event -> Platform.exit());
+                delay.play();
+            }
         } catch (SkyException e) {
             DialogBox errorBox =
                     DialogBox.getSkyDialog("Oops! " + e.getMessage(), skyImage);
