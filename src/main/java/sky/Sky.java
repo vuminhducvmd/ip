@@ -51,6 +51,11 @@ public class Sky {
 
     // ---------- command handlers ----------
 
+    /**
+     * Formats the current task list into a numbered string representation.
+     *
+     * @return A formatted string listing all tasks in the task list
+     */
     private String formatList() {
         StringBuilder sb = new StringBuilder("Here are the tasks in your list:\n");
         for (int i = 0; i < tasks.size(); i++) {
@@ -59,12 +64,25 @@ public class Sky {
         return sb.toString();
     }
 
+    /**
+     * Validates that a given task index is within the valid range.
+     *
+     * @param index Index of the task (0-based)
+     * @throws SkyException If the index is out of bounds
+     */
     private void validateIndex(int index) throws SkyException {
         if (index < 0 || index >= tasks.size()) {
             throw new SkyException("Invalid task number.");
         }
     }
 
+    /**
+     * Handles the {@code find} command by searching tasks containing a keyword.
+     *
+     * @param input Full user input containing the search keyword
+     * @return A formatted list of tasks matching the keyword
+     * @throws SkyException If the keyword is missing
+     */
     private String handleFind(String input) throws SkyException {
         String keyword = input.substring(4).trim();
         if (keyword.isEmpty()) {
@@ -79,6 +97,13 @@ public class Sky {
         return sb.toString();
     }
 
+    /**
+     * Handles the {@code mark} command to mark a task as completed.
+     *
+     * @param input User command containing the task index
+     * @return Confirmation message for the marked task
+     * @throws SkyException If the index is invalid
+     */
     private String handleMark(String input) throws SkyException {
         int index = Parser.parseIndex(input, "mark");
         validateIndex(index);
@@ -88,6 +113,13 @@ public class Sky {
         return "Nice! I've marked this task as done:\n  " + tasks.get(index);
     }
 
+    /**
+     * Handles the {@code unmark} command to mark a task as not completed.
+     *
+     * @param input User command containing the task index
+     * @return Confirmation message for the updated task
+     * @throws SkyException If the index is invalid
+     */
     private String handleUnmark(String input) throws SkyException {
         int index = Parser.parseIndex(input, "unmark");
         validateIndex(index);
@@ -97,6 +129,13 @@ public class Sky {
         return "OK, I've marked this task as not done yet:\n  " + tasks.get(index);
     }
 
+    /**
+     * Handles the {@code delete} command to remove a task from the task list.
+     *
+     * @param input User command containing the task index
+     * @return Confirmation message showing the removed task
+     * @throws SkyException If the index is invalid
+     */
     private String handleDelete(String input) throws SkyException {
         int index = Parser.parseIndex(input, "delete");
         validateIndex(index);
@@ -107,6 +146,13 @@ public class Sky {
                 + "\nNow you have " + tasks.size() + " tasks in the list.";
     }
 
+    /**
+     * Handles the {@code update} command to modify a field of an existing task.
+     *
+     * @param input User command specifying index, field, and new value
+     * @return Confirmation message showing the updated task
+     * @throws SkyException If the command format, index, or field is invalid
+     */
     private String handleUpdate(String input) throws SkyException {
         String[] parts = input.split(" ", 4);
 
@@ -163,6 +209,13 @@ public class Sky {
         return "Updated task:\n  " + task;
     }
 
+    /**
+     * Handles the {@code todo} command to create a new todo task.
+     *
+     * @param input User command containing the task description
+     * @return Confirmation message for the added task
+     * @throws SkyException If the description is empty
+     */
     private String handleTodo(String input) throws SkyException {
         String desc = input.substring(4).trim();
         if (desc.isEmpty()) {
@@ -173,6 +226,13 @@ public class Sky {
         return "Got it. I've added this task:\n  " + tasks.get(tasks.size() - 1);
     }
 
+    /**
+     * Handles the {@code deadline} command to create a new deadline task.
+     *
+     * @param input User command containing description and due date
+     * @return Confirmation message for the added task
+     * @throws SkyException If the description or date format is invalid
+     */
     private String handleDeadline(String input) throws SkyException {
         String body = input.substring(8).trim();
 
@@ -201,6 +261,13 @@ public class Sky {
         return "Got it. I've added this task:\n  " + tasks.get(tasks.size() - 1);
     }
 
+    /**
+     * Handles the {@code event} command to create a new event task.
+     *
+     * @param input User command containing description, start date, and end date
+     * @return Confirmation message for the added event
+     * @throws SkyException If the description or date format is invalid
+     */
     private String handleEvent(String input) throws SkyException {
         String body = input.substring(5).trim();
 

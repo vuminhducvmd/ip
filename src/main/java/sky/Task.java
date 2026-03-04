@@ -53,6 +53,12 @@ public abstract class Task {
         return description;
     }
 
+    /**
+     * Updates the description of this task.
+     *
+     * @param newDescription New description for the task
+     * @throws IllegalArgumentException If the new description is null or blank
+     */
     public void updateDescription(String newDescription) {
         if (newDescription == null || newDescription.isBlank()) {
             throw new IllegalArgumentException("Description cannot be empty.");

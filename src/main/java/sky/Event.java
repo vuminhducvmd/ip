@@ -25,6 +25,12 @@ public class Event extends Task {
         this.to = to;
     }
 
+    /**
+     * Updates the start date of this event.
+     *
+     * @param newFrom New start date
+     * @throws IllegalArgumentException If the start date is after the end date
+     */
     public void updateFrom(LocalDate newFrom) {
         if (newFrom.isAfter(this.to)) {
             throw new IllegalArgumentException("Start date cannot be after end date.");
@@ -33,6 +39,11 @@ public class Event extends Task {
         this.from = newFrom;
     }
 
+    /**
+     * Updates the end date of this event.
+     *
+     * @param newTo New end date
+     */
     public void updateTo(LocalDate newTo) {
         this.to = newTo;
     }

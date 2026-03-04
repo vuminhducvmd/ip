@@ -22,6 +22,11 @@ public class Deadline extends Task {
         this.by = by;
     }
 
+    /**
+     * Updates the due date of this deadline task.
+     *
+     * @param newDate New due date
+     */
     public void updateBy(LocalDate newDate) {
         this.by = newDate;
     }

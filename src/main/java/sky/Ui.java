@@ -3,9 +3,10 @@ import java.util.Scanner;
 
 
 /**
- * Handles user interaction for the Sky task manager.
+ * Handles command-line interaction for the Sky task manager.
  * <p>
- * Responsible for displaying messages and reading user input.
+ * Responsible for displaying messages and reading user input
+ * when running the CLI version of the application.
  */
 public class Ui {
     private static final String LINE =

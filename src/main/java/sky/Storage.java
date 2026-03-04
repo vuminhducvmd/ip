@@ -44,6 +44,8 @@ public class Storage {
 
     /**
      * Loads tasks from the storage file.
+     * <p>
+     * If the storage file does not exist, an empty task list is returned.
      *
      * @return List of tasks loaded from storage
      */
@@ -117,9 +119,6 @@ public class Storage {
 
         String type = parts[IDX_TYPE];
         String description = parts[IDX_DESC];
-
-        assert parts.length >= 3
-            : "Storage.parseTask: invalid file format";
 
         assert parts.length >= 3
             : "Storage.parseTask: invalid file format";
