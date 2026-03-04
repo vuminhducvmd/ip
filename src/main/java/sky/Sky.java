@@ -59,6 +59,12 @@ public class Sky {
         return sb.toString();
     }
 
+    private void validateIndex(int index) throws SkyException {
+        if (index < 0 || index >= tasks.size()) {
+            throw new SkyException("Invalid task number.");
+        }
+    }
+
     private String handleFind(String input) throws SkyException {
         String keyword = input.substring(4).trim();
         if (keyword.isEmpty()) {
@@ -75,6 +81,8 @@ public class Sky {
 
     private String handleMark(String input) throws SkyException {
         int index = Parser.parseIndex(input, "mark");
+        validateIndex(index);
+
         tasks.get(index).markAsDone();
         storage.save(tasks);
         return "Nice! I've marked this task as done:\n  " + tasks.get(index);
@@ -82,6 +90,8 @@ public class Sky {
 
     private String handleUnmark(String input) throws SkyException {
         int index = Parser.parseIndex(input, "unmark");
+        validateIndex(index);
+
         tasks.get(index).markAsNotDone();
         storage.save(tasks);
         return "OK, I've marked this task as not done yet:\n  " + tasks.get(index);
@@ -89,6 +99,8 @@ public class Sky {
 
     private String handleDelete(String input) throws SkyException {
         int index = Parser.parseIndex(input, "delete");
+        validateIndex(index);
+
         Task removed = tasks.remove(index);
         storage.save(tasks);
         return "Noted. I've removed this task:\n  " + removed
@@ -109,9 +121,7 @@ public class Sky {
             throw new SkyException("Please provide a valid task number.");
         }
 
-        if (index < 0 || index >= tasks.size()) {
-            throw new SkyException("Please provide a valid task number.");
-        }
+        validateIndex(index);
 
         String field = parts[2];
         String value = parts[3];
