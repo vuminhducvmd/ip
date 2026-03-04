@@ -18,13 +18,19 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/view/MainWindow.fxml")
         );
-        stage.setScene(new Scene(loader.load()));
 
-        // inject Sky into controller
+        Scene scene = new Scene(loader.load());
+
+        stage.setScene(scene);
+
         loader.<sky.gui.controller.MainWindow>getController().setSky(sky);
 
         stage.setTitle("Sky");
-        
+
+        // prevent UI breaking when resized too small
+        stage.setMinWidth(500);
+        stage.setMinHeight(400);
+
         stage.show();
     }
 }
