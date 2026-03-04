@@ -174,25 +174,58 @@ public class Sky {
     }
 
     private String handleDeadline(String input) throws SkyException {
-        String[] parts = input.substring(8).trim().split(" /by ", 2);
-        if (parts.length < 2) {
-            throw new SkyException("A deadline must have /by <time>.");
+        String body = input.substring(8).trim();
+
+        // check missing description
+        if (body.startsWith("/by")) {
+            throw new SkyException(
+                    "Deadline description cannot be empty.\n"
+                    + "Format: deadline <description> /by <date>"
+            );
         }
+
+        String[] parts = body.split(" /by ", 2);
+
+        if (parts.length < 2) {
+            throw new SkyException(
+                    "A deadline must have /by <date>.\n"
+                    + "Format: deadline <description> /by <date>"
+            );
+        }
+
         LocalDate by = Parser.parseDate(parts[1], "deadline /by");
+
         tasks.add(new Deadline(parts[0], by));
         storage.save(tasks);
+
         return "Got it. I've added this task:\n  " + tasks.get(tasks.size() - 1);
     }
 
     private String handleEvent(String input) throws SkyException {
-        String[] parts = input.substring(5).trim().split(" /from | /to ");
-        if (parts.length < 3) {
-            throw new SkyException("An event must have /from <start> /to <end>.");
+        String body = input.substring(5).trim();
+
+        if (body.startsWith("/from")) {
+            throw new SkyException(
+                    "Event description cannot be empty.\n"
+                    + "Format: event <description> /from <date> /to <date>"
+            );
         }
+
+        String[] parts = body.split(" /from | /to ");
+
+        if (parts.length < 3) {
+            throw new SkyException(
+                    "An event must have /from <start> /to <end>.\n"
+                    + "Format: event <description> /from <date> /to <date>"
+            );
+        }
+
         LocalDate from = Parser.parseDate(parts[1], "event /from");
         LocalDate to = Parser.parseDate(parts[2], "event /to");
+
         tasks.add(new Event(parts[0], from, to));
         storage.save(tasks);
+
         return "Got it. I've added this task:\n  " + tasks.get(tasks.size() - 1);
     }
 }
